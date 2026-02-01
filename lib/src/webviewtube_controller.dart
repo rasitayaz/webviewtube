@@ -458,6 +458,7 @@ String _generateIframePage(String videoId, WebviewtubeOptions options) {
 
         var player;
         var timerId;
+        var shouldLoop = ${_boolean(options.loop)};
         function onYouTubeIframeAPIReady() {
             player = new YT.Player('player', {
                 height: '100%',
@@ -472,8 +473,6 @@ String _generateIframePage(String videoId, WebviewtubeOptions options) {
                     'fs': ${_boolean(options.enableFullscreen)},
                     'hl': '${options.interfaceLanguage}',
                     'iv_load_policy': 3,
-                    'loop': ${_boolean(options.loop)},
-                    ${options.loop ? "'playlist': '$videoId'," : ''}
                     'playsinline': 1,
                     'rel': 0,
                     ${options.origin != null ? "'origin': '${options.origin}'," : ''}
@@ -505,6 +504,11 @@ String _generateIframePage(String videoId, WebviewtubeOptions options) {
                 startSendCurrentTimeInterval();
                 sendVideoData(player);
             }
+            // Manual loop: when video ends, restart from beginning
+            if (playerState == 0 && shouldLoop) {
+                player.seekTo(0);
+                player.playVideo();
+            }
         }
 
         function sendVideoData(player) {
@@ -519,9 +523,17 @@ String _generateIframePage(String videoId, WebviewtubeOptions options) {
 
         function startSendCurrentTimeInterval() {
             timerId = setInterval(function () {
+                var currentTime = player.getCurrentTime();
+                var duration = player.getDuration();
+
+                if (shouldLoop && duration > 0 && (duration - currentTime) <= 0.5) {
+                    player.seekTo(0);
+                    currentTime = 0;
+                }
+
                 sendMessageToDart('CurrentTime',
                     {
-                        'position': player.getCurrentTime(),
+                        'position': currentTime,
                         'buffered': player.getVideoLoadedFraction()
                     });
             }, ${options.currentTimeUpdateInterval});
