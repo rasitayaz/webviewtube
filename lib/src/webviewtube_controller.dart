@@ -459,6 +459,8 @@ String _generateIframePage(String videoId, WebviewtubeOptions options) {
         var player;
         var timerId;
         var shouldLoop = ${_boolean(options.loop)};
+        var startAt = ${options.startAt};
+        var endAt = ${options.endAt ?? 'null'};
         function onYouTubeIframeAPIReady() {
             player = new YT.Player('player', {
                 height: '100%',
@@ -506,7 +508,7 @@ String _generateIframePage(String videoId, WebviewtubeOptions options) {
             }
             // Manual loop: when video ends, restart from beginning
             if (playerState == 0 && shouldLoop) {
-                player.seekTo(0);
+                player.seekTo(startAt);
                 player.playVideo();
             }
         }
@@ -525,10 +527,11 @@ String _generateIframePage(String videoId, WebviewtubeOptions options) {
             timerId = setInterval(function () {
                 var currentTime = player.getCurrentTime();
                 var duration = player.getDuration();
+                var effectiveEnd = (endAt != null) ? endAt : duration;
 
-                if (shouldLoop && duration > 0 && (duration - currentTime) <= 0.5) {
-                    player.seekTo(0);
-                    currentTime = 0;
+                if (shouldLoop && effectiveEnd > 0 && (effectiveEnd - currentTime) <= 0.5) {
+                    player.seekTo(startAt);
+                    currentTime = startAt;
                 }
 
                 sendMessageToDart('CurrentTime',
