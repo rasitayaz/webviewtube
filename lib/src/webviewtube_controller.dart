@@ -552,19 +552,27 @@ String _generateIframePage(String videoId, WebviewtubeOptions options) {
         }
 
         function loadById(loadSettings) {
+            startAt = loadSettings.startSeconds || 0;
+            endAt = loadSettings.endSeconds || null;
             player.loadVideoById(loadSettings);
         }
 
         function cueById(cueSettings) {
+            startAt = cueSettings.startSeconds || 0;
+            endAt = cueSettings.endSeconds || null;
             player.cueVideoById(cueSettings);
         }
 
-        function loadPlaylist(playlist, index, startAt) {
-            player.loadPlaylist(playlist, index, startAt);
+        function loadPlaylist(playlist, index, startSeconds) {
+            startAt = startSeconds || 0;
+            endAt = null;
+            player.loadPlaylist(playlist, index, startSeconds);
         }
 
-        function cuePlaylist(playlist, index, startAt) {
-            player.cuePlaylist(playlist, index, startAt);
+        function cuePlaylist(playlist, index, startSeconds) {
+            startAt = startSeconds || 0;
+            endAt = null;
+            player.cuePlaylist(playlist, index, startSeconds);
         }
 
         function nextVideo() {
