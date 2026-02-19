@@ -355,6 +355,25 @@ class WebviewtubeController extends ValueNotifier<WebviewTubeValue> {
     _isPlaylist = false;
   }
 
+  /// Loads and plays the specified video instantly with forced autoplay.
+  Future<void> loadAndPlay(String videoId,
+      {int startAt = 0, int? endAt}) async {
+    if (endAt != null) {
+      assert(startAt < endAt);
+    }
+
+    var params = 'videoId: "$videoId"';
+    if (startAt > 0) {
+      params += ', startSeconds: $startAt';
+    }
+    if (endAt != null) {
+      params += ', endSeconds: $endAt';
+    }
+
+    await _callMethod('loadAndPlayById({$params})');
+    _isPlaylist = false;
+  }
+
   /// Loads the specified video's thumbnail and prepares the player.
   Future<void> cue(String videoId, {int startAt = 0, int? endAt}) async {
     if (endAt != null) {
@@ -458,6 +477,7 @@ String _generateIframePage(String videoId, WebviewtubeOptions options) {
 
         var player;
         var timerId;
+        var forceAutoPlay = ${_boolean(options.forceAutoPlay)};
         var shouldLoop = ${_boolean(options.loop)};
         var startAt = ${options.startAt};
         var endAt = ${options.endAt ?? 'null'};
@@ -501,6 +521,15 @@ String _generateIframePage(String videoId, WebviewtubeOptions options) {
 
         function sendPlayerStateChange(playerState) {
             clearTimeout(timerId);
+            
+            if (forceAutoPlay) {
+                if (playerState === 1) {
+                    forceAutoPlay = false;
+                } else if (playerState === -1 || playerState === 2 || playerState === 5) {
+                    player.playVideo();
+                }
+            }
+
             sendMessageToDart('StateChange', { 'state': playerState });
             if (playerState == 1) {
                 startSendCurrentTimeInterval();
@@ -552,6 +581,13 @@ String _generateIframePage(String videoId, WebviewtubeOptions options) {
         }
 
         function loadById(loadSettings) {
+            startAt = loadSettings.startSeconds || 0;
+            endAt = loadSettings.endSeconds || null;
+            player.loadVideoById(loadSettings);
+        }
+
+        function loadAndPlayById(loadSettings) {
+            forceAutoPlay = true;
             startAt = loadSettings.startSeconds || 0;
             endAt = loadSettings.endSeconds || null;
             player.loadVideoById(loadSettings);

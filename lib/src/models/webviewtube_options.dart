@@ -9,6 +9,7 @@ class WebviewtubeOptions {
   const WebviewtubeOptions({
     this.showControls = true,
     this.enableFullscreen = true,
+    this.forceAutoPlay = false,
     this.mute = false,
     this.loop = false,
     this.forceHd = false,
@@ -36,6 +37,11 @@ class WebviewtubeOptions {
   ///
   /// Defaults to true.
   final bool enableFullscreen;
+
+  /// Whether the video should automatically play when loaded.
+  ///
+  /// Defaults to false.
+  final bool forceAutoPlay;
 
   /// Mutes the player after initialization.
   ///
@@ -109,6 +115,7 @@ class WebviewtubeOptions {
   WebviewtubeOptions copyWith({
     bool? showControls,
     bool? enableFullscreen,
+    bool? forceAutoPlay,
     bool? mute,
     bool? loop,
     bool? forceHd,
@@ -124,6 +131,7 @@ class WebviewtubeOptions {
     return WebviewtubeOptions(
       showControls: showControls ?? this.showControls,
       enableFullscreen: enableFullscreen ?? this.enableFullscreen,
+      forceAutoPlay: forceAutoPlay ?? this.forceAutoPlay,
       mute: mute ?? this.mute,
       loop: loop ?? this.loop,
       forceHd: forceHd ?? this.forceHd,
@@ -145,6 +153,7 @@ class WebviewtubeOptions {
       other.runtimeType == runtimeType &&
       other.showControls == showControls &&
       other.enableFullscreen == enableFullscreen &&
+      other.forceAutoPlay == forceAutoPlay &&
       other.mute == mute &&
       other.loop == loop &&
       other.forceHd == forceHd &&
@@ -162,6 +171,7 @@ class WebviewtubeOptions {
         runtimeType,
         showControls,
         enableFullscreen,
+        forceAutoPlay,
         mute,
         loop,
         forceHd,
@@ -180,6 +190,7 @@ class WebviewtubeOptions {
     return 'WebviewtubeOptions('
         'showControls: $showControls, '
         'enableFullscreen: $enableFullscreen, '
+        'forceAutoPlay: $forceAutoPlay, '
         'mute: $mute, '
         'loop: $loop, '
         'forceHd: $forceHd, '
